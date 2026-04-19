@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <section class="row g-4 mb-4">
+  <section class="page-intro dashboard-intro">
+    <h1 class="page-heading mb-3">Dashboard</h1>
+    <p class="page-subtitle mb-0">Welcome to the Classification System Overview</p>
+  </section>
+
+  <section class="row g-4 mb-5 stats-grid dashboard-stats">
     {% for stat in stats %}
       <div class="col-md-6 col-xl-3">
         <div class="metric-card metric-{{ stat.accent }}">
@@ -17,112 +22,25 @@
     {% endfor %}
   </section>
 
-  <section class="hero-card mb-4">
-    <div class="row g-4 align-items-center">
-      <div class="col-lg-7">
-        <p class="eyebrow text-white-50 mb-3">Welcome back, {{ nama_user }}</p>
+  <section class="row g-4 dashboard-hero-wrap">
+    <div class="col-12">
+      <div class="hero-card">
         <h2 class="hero-title">Quick Start Guide</h2>
-        <p class="hero-copy">
-          Tata letak ini mengikuti referensi UI example: dashboard bersih, sidebar tegas,
-          dan kartu informasi yang langsung mengarahkan ke workflow utama.
-        </p>
-      </div>
-      <div class="col-lg-5">
-        <div class="row g-3">
-          <div class="col-md-4 col-lg-12">
-            <div class="hero-step">
-              <span>1</span>
-              <h3>Upload Data</h3>
-              <p>Mulai dari data pengajar untuk menyiapkan dataset inti.</p>
-            </div>
+        <div class="hero-guide-grid">
+          <div class="hero-guide-card">
+            <span class="hero-guide-step">1</span>
+            <h3>Upload Data</h3>
+            <p>Navigate to Data Pengajar and upload your teacher dataset</p>
           </div>
-          <div class="col-md-4 col-lg-12">
-            <div class="hero-step">
-              <span>2</span>
-              <h3>Pre-Process</h3>
-              <p>Rapikan data, validasi kolom, dan siapkan input klasifikasi.</p>
-            </div>
+          <div class="hero-guide-card">
+            <span class="hero-guide-step">2</span>
+            <h3>Process Data</h3>
+            <p>Run pre-processing to clean and prepare your data</p>
           </div>
-          <div class="col-md-4 col-lg-12">
-            <div class="hero-step">
-              <span>3</span>
-              <h3>Review Result</h3>
-              <p>Lihat rekapan hasil dan evaluasi performa pengajar.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="row g-4">
-    <div class="col-xl-7">
-      <div class="content-card h-100">
-        <div class="content-card-header">
-          <div>
-            <p class="eyebrow mb-2">Recent Records</p>
-            <h3 class="content-title">Pengajar Terbaru</h3>
-          </div>
-          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('data_pengajar') }}">Lihat Semua</a>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table app-table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nama Pengajar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if recent_teachers %}
-                {% for teacher in recent_teachers %}
-                  <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ teacher.nama_pengajar }}</td>
-                  </tr>
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="2" class="text-center py-5 text-muted">Belum ada data pengajar.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-xl-5">
-      <div class="content-card h-100">
-        <div class="content-card-header">
-          <div>
-            <p class="eyebrow mb-2">System Overview</p>
-            <h3 class="content-title">Alur Modul</h3>
-          </div>
-        </div>
-
-        <div class="timeline-list">
-          <div class="timeline-item">
-            <div class="timeline-dot bg-primary"></div>
-            <div>
-              <h4>Data Pengajar</h4>
-              <p>Pusat data utama untuk daftar pengajar yang akan dianalisis.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot bg-secondary"></div>
-            <div>
-              <h4>Rekapan Klasifikasi</h4>
-              <p>Lihat hasil kategori, skor, dan ringkasan performa.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot bg-success"></div>
-            <div>
-              <h4>Pre-Processing</h4>
-              <p>Siapkan data mentah agar siap dipakai dalam model klasifikasi.</p>
-            </div>
+          <div class="hero-guide-card">
+            <span class="hero-guide-step">3</span>
+            <h3>View Results</h3>
+            <p>Check classification results in the Rekapan section</p>
           </div>
         </div>
       </div>

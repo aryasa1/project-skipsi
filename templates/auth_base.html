@@ -6,10 +6,9 @@
     <title>{{ page_title or 'Authentication' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendors/css/vendor.bundle.base.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dashboard.css', v='20260419c') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
   </head>
   <body class="auth-body">
@@ -17,11 +16,10 @@
       <div class="row min-vh-100">
         <div class="col-lg-6 auth-panel-left d-none d-lg-flex">
           <div class="auth-hero">
-            <p class="eyebrow mb-3">UI Example Inspired</p>
-            <h1 class="auth-title">Bootstrap dashboard template for your skripsi workflow.</h1>
+            <p class="eyebrow mb-3">Minimal Workspace</p>
+            <h1 class="auth-title">Dashboard akademik yang bersih, rapi, dan fokus pada data.</h1>
             <p class="auth-copy">
-              Tampilan ini mengambil arah visual dari referensi dashboard yang kamu simpan:
-              sidebar tegas, warna hangat, dan kartu informasi yang lebih modern.
+              Antarmuka disusun ulang dengan pendekatan profesional dan minimal agar nyaman dipakai di desktop maupun mobile.
             </p>
 
             <div class="auth-feature-grid">
@@ -53,6 +51,5 @@
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='vendors/js/vendor.bundle.base.js') }}"></script>
   </body>
 </html>

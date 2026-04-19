@@ -1,37 +1,44 @@
 <div class="sidebar-shell d-flex flex-column h-100">
+  <button class="sidebar-collapse-toggle d-none d-lg-inline-flex" type="button" data-sidebar-collapse aria-label="Toggle sidebar" aria-expanded="true">
+    <i class="fa fa-chevron-left"></i>
+  </button>
+
   <div class="sidebar-brand border-bottom">
     <a class="text-decoration-none" href="{{ url_for('dashboard') }}">
-      <span class="brand-mark">S</span>
-      <div>
-        <h1 class="brand-title mb-1">Skripsi<span>.</span></h1>
+      <div class="brand-initial" aria-hidden="true">S</div>
+      <div class="brand-copy">
+        <h1 class="brand-title mb-1">Skripsi</h1>
         <p class="brand-subtitle mb-0">Classification System</p>
       </div>
     </a>
   </div>
 
-  <nav class="nav flex-column gap-2 p-3">
+  <nav class="nav flex-column gap-2 px-4 py-4">
     <a class="nav-link sidebar-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
       <i class="fa fa-dashboard"></i>
-      <span>Dashboard</span>
+      <span class="sidebar-link-label">Dashboard</span>
     </a>
     <a class="nav-link sidebar-link {% if active_page == 'data_pengajar' %}active{% endif %}" href="{{ url_for('data_pengajar') }}">
       <i class="fa fa-database"></i>
-      <span>Data Pengajar</span>
+      <span class="sidebar-link-label">Data Pengajar</span>
     </a>
     <a class="nav-link sidebar-link {% if active_page == 'rekapan' %}active{% endif %}" href="{{ url_for('rekapan') }}">
       <i class="fa fa-bar-chart"></i>
-      <span>Rekapan Klasifikasi</span>
+      <span class="sidebar-link-label">Rekapan Klasifikasi</span>
     </a>
     <a class="nav-link sidebar-link {% if active_page == 'preprocessing' %}active{% endif %}" href="{{ url_for('preprocessing') }}">
       <i class="fa fa-upload"></i>
-      <span>Pre-Processing</span>
+      <span class="sidebar-link-label">Pre-Processing</span>
     </a>
   </nav>
 
   <div class="sidebar-user mt-auto p-3">
     <div class="sidebar-user-card">
-      <p class="text-uppercase small mb-1">Logged In As</p>
-      <h2 class="h5 mb-0">{{ session.get('user', 'Administrator') }}</h2>
+      <div class="sidebar-user-initial" aria-hidden="true">A</div>
+      <div class="sidebar-user-copy">
+        <p class="small mb-1">Logged in as</p>
+        <h2 class="h5 mb-0">Administrator</h2>
+      </div>
     </div>
   </div>
 </div>

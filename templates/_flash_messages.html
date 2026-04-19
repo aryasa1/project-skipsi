@@ -2,9 +2,8 @@
   {% if messages %}
     <div class="d-grid gap-2 mb-4">
       {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-{{ category }}" role="alert">
           {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% endfor %}
     </div>

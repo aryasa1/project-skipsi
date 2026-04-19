@@ -1,91 +1,59 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <section class="row g-4 mb-4">
-    {% for item in summary_cards %}
-      <div class="col-md-6 col-xl-3">
-        <div class="metric-card metric-{{ item.accent }}">
-          <div>
-            <p class="metric-label">{{ item.title }}</p>
-            <h2 class="metric-value">{{ item.value }}</h2>
-          </div>
-          <div class="metric-icon">
-            <i class="fa fa-pie-chart"></i>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+  <section class="page-intro">
+    <h1 class="page-heading mb-3">Rekapan Klasifikasi</h1>
+    <p class="page-subtitle mb-0">Classification results and performance summary</p>
   </section>
 
-  <section class="row g-4">
-    <div class="col-xl-8">
-      <div class="content-card h-100">
-        <div class="content-card-header">
-          <div>
-            <p class="eyebrow mb-2">Classification Summary</p>
-            <h3 class="content-title">Rekap Hasil</h3>
-          </div>
-          <span class="badge app-badge">Latest snapshot</span>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table app-table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Pengajar</th>
-                <th>Kategori</th>
-                <th>Skor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in classification_rows %}
-                <tr>
-                  <td>{{ row.no }}</td>
-                  <td>{{ row.pengajar }}</td>
-                  <td><span class="badge category-badge">{{ row.kategori }}</span></td>
-                  <td>{{ row.skor }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+  <section class="upload-card prototype-upload-card mb-4">
+    <div class="upload-card-body">
+      <div class="upload-icon"><i class="fa fa-file-text-o"></i></div>
+      <div>
+        <div class="upload-title">Upload Classification Results</div>
+        <p class="upload-note mb-1">Drag and drop or click to browse</p>
+        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
       </div>
+      <button class="btn btn-primary" type="button">Choose File</button>
+    </div>
+  </section>
+
+  <section class="content-card data-table-card mb-4">
+    <div class="table-title-bar">
+      <h3 class="content-title">Classification Summary</h3>
     </div>
 
-    <div class="col-xl-4">
-      <div class="content-card h-100">
-        <div class="content-card-header">
-          <div>
-            <p class="eyebrow mb-2">Notes</p>
-            <h3 class="content-title">Insight Cepat</h3>
-          </div>
-        </div>
+    <div class="table-responsive">
+      <table class="table app-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Pengajar</th>
+            <th>Kategori</th>
+            <th>Skor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in classification_rows %}
+            <tr>
+              <td>{{ row.no }}</td>
+              <td>{{ row.pengajar }}</td>
+              <td>{{ row.kategori }}</td>
+              <td>{{ row.skor }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-        <div class="timeline-list">
-          <div class="timeline-item">
-            <div class="timeline-dot bg-success"></div>
-            <div>
-              <h4>Excellent dominan</h4>
-              <p>Mayoritas data terbaru berada di kategori tinggi.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot bg-warning"></div>
-            <div>
-              <h4>Perlu review manual</h4>
-              <p>Beberapa skor menengah cocok untuk evaluasi lanjutan.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-dot bg-primary"></div>
-            <div>
-              <h4>Dashboard-ready</h4>
-              <p>Tampilan bootstrap ini sudah siap dijadikan dasar visual halaman lanjutan.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="table-footer">
+      <p class="mb-0 text-muted">Showing {{ classification_rows|length }} entries</p>
+      <nav aria-label="Pagination">
+        <ul class="pagination mb-0">
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        </ul>
+      </nav>
     </div>
   </section>
 {% endblock %}

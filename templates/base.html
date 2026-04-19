@@ -6,53 +6,88 @@
     <title>{{ page_title or 'Skripsi Dashboard' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendors/css/vendor.bundle.base.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dashboard.css', v='20260419c') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
   </head>
   <body class="app-body">
-    <div class="app-background"></div>
-
-    <button class="btn btn-primary app-mobile-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
-      <i class="fa fa-bars"></i>
-    </button>
-
-    <div class="offcanvas offcanvas-start mobile-sidebar" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-      <div class="offcanvas-body p-0">
-        {% include '_sidebar.html' %}
-      </div>
-    </div>
-
     <div class="app-shell">
-      <aside class="app-sidebar d-none d-lg-flex">
+      <aside class="app-sidebar app-sidebar-desktop">
+        {% include '_sidebar.html' %}
+      </aside>
+
+      <div class="app-mobile-backdrop" data-sidebar-close></div>
+
+      <aside class="app-sidebar app-sidebar-mobile" id="appMobileSidebar">
         {% include '_sidebar.html' %}
       </aside>
 
       <main class="app-main">
-        <header class="topbar-card">
-          <div>
-            <p class="eyebrow mb-2">{{ page_title or 'Overview' }}</p>
-            <h1 class="page-heading mb-2">{{ page_title or 'Dashboard' }}</h1>
-            <p class="page-subtitle mb-0">{{ page_subtitle or 'Monitor your classification workflow from one place.' }}</p>
-          </div>
-
-          <div class="topbar-actions">
-            <div class="status-pill">
-              <span class="status-dot"></span>
-              <span>Sistem aktif</span>
-            </div>
-            <a class="btn btn-outline-light topbar-logout" href="{{ url_for('logout') }}">Logout</a>
-          </div>
-        </header>
-
-        {% include '_flash_messages.html' %}
-
-        {% block content %}{% endblock %}
+        <div class="app-content">
+          <button class="app-mobile-toggle" type="button" aria-label="Open menu" aria-controls="appMobileSidebar" aria-expanded="false">
+            <i class="fa fa-bars"></i>
+          </button>
+          {% include '_flash_messages.html' %}
+          {% block content %}{% endblock %}
+        </div>
       </main>
     </div>
 
-    <script src="{{ url_for('static', filename='vendors/js/vendor.bundle.base.js') }}"></script>
+    <script>
+      (() => {
+        const body = document.body;
+        const toggle = document.querySelector('.app-mobile-toggle');
+        const closeTargets = document.querySelectorAll('[data-sidebar-close]');
+        const collapseButtons = document.querySelectorAll('[data-sidebar-collapse]');
+        const setOpen = (open) => {
+          body.classList.toggle('sidebar-open', open);
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          }
+        };
+
+        document.querySelectorAll('.offcanvas.mobile-sidebar, #mobileSidebar.offcanvas').forEach((node) => {
+          node.remove();
+        });
+        body.classList.remove('offcanvas-backdrop-open');
+
+        const setCollapsed = (collapsed) => {
+          body.classList.toggle('sidebar-collapsed', collapsed);
+          collapseButtons.forEach((button) => {
+            button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+          });
+          try {
+            localStorage.setItem('skripsi-sidebar-collapsed', collapsed ? '1' : '0');
+          } catch (e) {}
+        };
+
+        try {
+          setCollapsed(localStorage.getItem('skripsi-sidebar-collapsed') === '1');
+        } catch (e) {}
+
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            setOpen(!body.classList.contains('sidebar-open'));
+          });
+        }
+
+        collapseButtons.forEach((button) => {
+          button.addEventListener('click', () => {
+            setCollapsed(!body.classList.contains('sidebar-collapsed'));
+          });
+        });
+
+        closeTargets.forEach((target) => {
+          target.addEventListener('click', () => setOpen(false));
+        });
+
+        window.addEventListener('resize', () => {
+          if (window.innerWidth >= 992) {
+            setOpen(false);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -72,15 +72,13 @@ def dashboard():
         return redirect('/login')
 
     username_login = session['user']
-    total_pengajar = DataPengajar.query.count()
-    total_users = users.query.count()
     recent_teachers = DataPengajar.query.order_by(DataPengajar.id.desc()).limit(5).all()
 
     stats = [
-        {"title": "Total Pengajar", "value": total_pengajar, "icon": "fa-database", "accent": "primary"},
-        {"title": "Hasil Klasifikasi", "value": max(total_pengajar, 0), "icon": "fa-bar-chart", "accent": "secondary"},
-        {"title": "Data Processed", "value": total_pengajar, "icon": "fa-file-text-o", "accent": "success"},
-        {"title": "Total Pengguna", "value": total_users, "icon": "fa-users", "accent": "warning"},
+        {"title": "Total Pengajar", "value": 5, "icon": "fa-users", "accent": "primary"},
+        {"title": "Hasil Klasifikasi", "value": 4, "icon": "fa-bar-chart", "accent": "secondary"},
+        {"title": "Data Processed", "value": 2, "icon": "fa-file-text-o", "accent": "success"},
+        {"title": "Avg. Score", "value": "86.9", "icon": "fa-line-chart", "accent": "warning"},
     ]
 
     return render_template(
