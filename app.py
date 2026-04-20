@@ -1,11 +1,141 @@
-from flask import Flask, render_template, request, redirect, session, url_for # Tambahkan url_for di sini
-from flask_sqlalchemy import SQLAlchemy 
+import os
+import csv
+from datetime import datetime
+
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'secretkey'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/klasifikasi'
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 db = SQLAlchemy(app)
+
+ALLOWED_UPLOAD_EXTENSIONS = {'csv', 'xlsx', 'xls'}
+
+
+def ensure_upload_folder():
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+def is_allowed_file(filename):
+    return (
+        '.' in filename
+        and filename.rsplit('.', 1)[1].lower() in ALLOWED_UPLOAD_EXTENSIONS
+    )
+
+
+def get_recent_uploads(limit=10):
+    ensure_upload_folder()
+    uploaded_files = []
+
+    for entry in os.scandir(app.config['UPLOAD_FOLDER']):
+        if not entry.is_file():
+            continue
+
+        stats = entry.stat()
+        uploaded_files.append(
+            {
+                'file': entry.name,
+                'status': 'Uploaded',
+                'tanggal': datetime.fromtimestamp(stats.st_mtime).strftime('%Y-%m-%d %H:%M'),
+            }
+        )
+
+    uploaded_files.sort(key=lambda item: item['tanggal'], reverse=True)
+    return uploaded_files[:limit]
+
+
+def get_latest_uploaded_file():
+    ensure_upload_folder()
+    files = [entry for entry in os.scandir(app.config['UPLOAD_FOLDER']) if entry.is_file()]
+    if not files:
+        return None
+    return max(files, key=lambda entry: entry.stat().st_mtime)
+
+
+def normalize_headers(header_row, width):
+    headers = []
+    for index in range(width):
+        raw_value = header_row[index] if index < len(header_row) else ''
+        label = str(raw_value).strip() if raw_value is not None else ''
+        headers.append(label or f'Kolom {index + 1}')
+    return headers
+
+
+def parse_csv_dataset(file_path):
+    with open(file_path, newline='', encoding='utf-8-sig') as csv_file:
+        rows = list(csv.reader(csv_file))
+    return rows
+
+
+def parse_xlsx_dataset(file_path):
+    from openpyxl import load_workbook
+
+    workbook = load_workbook(file_path, read_only=True, data_only=True)
+    try:
+        worksheet = workbook.active
+        return [list(row) for row in worksheet.iter_rows(values_only=True)]
+    finally:
+        workbook.close()
+
+
+def parse_xls_dataset(file_path):
+    import xlrd
+
+    workbook = xlrd.open_workbook(file_path)
+    worksheet = workbook.sheet_by_index(0)
+    return [worksheet.row_values(index) for index in range(worksheet.nrows)]
+
+
+def get_uploaded_dataset_preview(limit=100):
+    latest_file = get_latest_uploaded_file()
+    if latest_file is None:
+        return {'headers': [], 'rows': [], 'total_rows': 0}
+
+    extension = latest_file.name.rsplit('.', 1)[1].lower()
+    raw_rows = []
+
+    if extension == 'csv':
+        raw_rows = parse_csv_dataset(latest_file.path)
+    elif extension == 'xlsx':
+        raw_rows = parse_xlsx_dataset(latest_file.path)
+    elif extension == 'xls':
+        raw_rows = parse_xls_dataset(latest_file.path)
+
+    cleaned_rows = []
+    for row in raw_rows:
+        normalized_row = ['' if cell is None else str(cell) for cell in row]
+        if any(str(cell).strip() for cell in normalized_row):
+            cleaned_rows.append(normalized_row)
+
+    if not cleaned_rows:
+        return {'headers': [], 'rows': [], 'total_rows': 0}
+
+    headers = normalize_headers(cleaned_rows[0], max(len(row) for row in cleaned_rows))
+    data_rows = []
+    for row in cleaned_rows[1:limit + 1]:
+        padded_row = row + [''] * (len(headers) - len(row))
+        data_rows.append(padded_row[:len(headers)])
+
+    return {
+        'headers': headers,
+        'rows': data_rows,
+        'total_rows': max(len(cleaned_rows) - 1, 0),
+    }
+
+
+def is_ajax_request():
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def render_page(template_name, partial_name, **context):
+    if is_ajax_request():
+        return render_template(partial_name, **context)
+    return render_template(template_name, **context)
 
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,8 +151,6 @@ class DataPengajar(db.Model):
 @app.route('/')
 def home():
     return redirect('/login')
-
-from flask import flash # Tambahkan flash untuk pesan error
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -81,8 +209,9 @@ def dashboard():
         {"title": "Avg. Score", "value": "86.9", "icon": "fa-line-chart", "accent": "warning"},
     ]
 
-    return render_template(
+    return render_page(
         'index.html',
+        '_dashboard_content.html',
         nama_user=username_login,
         active_page='dashboard',
         page_title='Dashboard',
@@ -109,8 +238,9 @@ def data_pengajar():
     # error_out=False supaya kalau halamannya tidak ada, tidak muncul error 404
     pengajar_paginated = query.paginate(page=page, per_page=10, error_out=False)
 
-    return render_template(
+    return render_page(
         'data_pengajar.html',
+        '_data_pengajar_content.html',
         data=pengajar_paginated,
         search_query=search_query,
         active_page='data_pengajar',
@@ -137,8 +267,9 @@ def rekapan():
         {"no": 4, "pengajar": "Dra. Indah Permata", "kategori": "Very Good", "skor": "85.3"},
     ]
 
-    return render_template(
+    return render_page(
         'rekapan.html',
+        '_rekapan_content.html',
         summary_cards=summary_cards,
         classification_rows=classification_rows,
         active_page='rekapan',
@@ -146,27 +277,44 @@ def rekapan():
         page_subtitle='Ringkasan hasil klasifikasi dan performa tiap pengajar.'
     )
 
-@app.route('/preprocessing')
+@app.route('/preprocessing', methods=['GET', 'POST'])
 def preprocessing():
     if 'user' not in session:
         return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        uploaded_file = request.files.get('dataset_file')
+
+        if uploaded_file is None or uploaded_file.filename == '':
+            flash('Pilih file terlebih dahulu sebelum upload.', 'danger')
+            return redirect(url_for('preprocessing'))
+
+        if not is_allowed_file(uploaded_file.filename):
+            flash('Format file tidak didukung. Gunakan CSV, XLSX, atau XLS.', 'danger')
+            return redirect(url_for('preprocessing'))
+
+        ensure_upload_folder()
+        original_name = secure_filename(uploaded_file.filename)
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        saved_name = f'{timestamp}_{original_name}'
+        save_path = os.path.join(app.config['UPLOAD_FOLDER'], saved_name)
+
+        uploaded_file.save(save_path)
+        flash(f'File {original_name} berhasil diupload.', 'success')
+        return redirect(url_for('preprocessing'))
 
     pipeline_steps = [
         {"title": "Upload Dataset", "description": "Unggah file mentah sebelum diproses lebih lanjut."},
         {"title": "Cleansing Data", "description": "Rapikan format, hapus duplikasi, dan validasi kolom inti."},
         {"title": "Run Classification", "description": "Lanjutkan ke proses klasifikasi setelah data siap."},
     ]
+    dataset_preview = get_uploaded_dataset_preview()
 
-    recent_jobs = [
-        {"file": "dataset_semester1.csv", "status": "Processed", "tanggal": "2026-04-15"},
-        {"file": "dataset_semester2.csv", "status": "Pending", "tanggal": "2026-04-16"},
-        {"file": "dataset_semester3.csv", "status": "Processed", "tanggal": "2026-04-14"},
-    ]
-
-    return render_template(
+    return render_page(
         'preprocessing.html',
+        '_preprocessing_content.html',
         pipeline_steps=pipeline_steps,
-        recent_jobs=recent_jobs,
+        dataset_preview=dataset_preview,
         active_page='preprocessing',
         page_title='Pre-Processing',
         page_subtitle='Pantau alur persiapan data sebelum klasifikasi dijalankan.'

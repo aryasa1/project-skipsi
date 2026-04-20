@@ -1,0 +1,86 @@
+<div class="page-fragment" data-page-title="{{ page_title or 'Data Pengajar' }}" data-active-page="{{ active_page or 'data_pengajar' }}">
+  {% include '_flash_messages.html' %}
+
+  <section class="page-intro">
+    <h1 class="page-heading mb-3">Data Pengajar</h1>
+    <p class="page-subtitle mb-0">Manage and view teacher data records</p>
+  </section>
+
+  <section class="upload-card upload-form-card mb-4">
+    <div class="upload-card-body">
+      <div class="upload-icon"><i class="fa fa-upload"></i></div>
+      <div>
+        <div class="upload-title">Upload Teacher Data</div>
+        <p class="upload-note mb-1">Drag and drop or click to browse</p>
+        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+      </div>
+      <button class="btn btn-primary" type="button">Choose File</button>
+    </div>
+  </section>
+
+  <section class="content-card data-table-card mb-4">
+    <div class="table-title-bar">
+      <div class="content-card-header mb-0">
+        <div>
+          <h3 class="content-title mb-1">Teacher Records</h3>
+          <p class="text-muted mb-0">Search results appear automatically after 3 characters.</p>
+        </div>
+        <form class="search-form" action="{{ url_for('data_pengajar') }}" method="get" data-live-search-form>
+          <div class="input-group">
+            <input
+              class="form-control"
+              type="search"
+              name="q"
+              value="{{ search_query }}"
+              placeholder="Cari nama pengajar..."
+              autocomplete="off"
+              data-live-search-input
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table app-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Pengajar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if data.items %}
+            {% for p in data.items %}
+              <tr>
+                <td>{{ (data.page - 1) * data.per_page + loop.index }}</td>
+                <td>{{ p.nama_pengajar }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="2" class="text-center py-5 text-muted">Tidak ada data yang cocok dengan pencarian saat ini.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <p class="mb-0 text-muted">
+        Showing {{ data.total }} entries
+      </p>
+
+      <nav aria-label="Pagination">
+        <ul class="pagination mb-0">
+          <li class="page-item {% if not data.has_prev %}disabled{% endif %}">
+            <a class="page-link" {% if data.has_prev %}data-ajax-nav="true"{% endif %} href="{% if data.has_prev %}{{ url_for('data_pengajar', page=data.prev_num, q=search_query) }}{% else %}#{% endif %}">Previous</a>
+          </li>
+          <li class="page-item {% if not data.has_next %}disabled{% endif %}">
+            <a class="page-link" {% if data.has_next %}data-ajax-nav="true"{% endif %} href="{% if data.has_next %}{{ url_for('data_pengajar', page=data.next_num, q=search_query) }}{% else %}#{% endif %}">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</div>

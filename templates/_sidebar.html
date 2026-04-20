@@ -1,10 +1,6 @@
 <div class="sidebar-shell d-flex flex-column h-100">
-  <button class="sidebar-collapse-toggle d-none d-lg-inline-flex" type="button" data-sidebar-collapse aria-label="Toggle sidebar" aria-expanded="true">
-    <i class="fa fa-chevron-left"></i>
-  </button>
-
   <div class="sidebar-brand border-bottom">
-    <a class="text-decoration-none" href="{{ url_for('dashboard') }}">
+    <a class="text-decoration-none" href="{{ url_for('dashboard') }}" data-ajax-nav="true" data-page="dashboard">
       <div class="brand-initial" aria-hidden="true">S</div>
       <div class="brand-copy">
         <h1 class="brand-title mb-1">Skripsi</h1>
@@ -14,21 +10,25 @@
   </div>
 
   <nav class="nav flex-column gap-2 px-4 py-4">
-    <a class="nav-link sidebar-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+    <a class="nav-link sidebar-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}" data-ajax-nav="true" data-page="dashboard">
       <i class="fa fa-dashboard"></i>
       <span class="sidebar-link-label">Dashboard</span>
     </a>
-    <a class="nav-link sidebar-link {% if active_page == 'data_pengajar' %}active{% endif %}" href="{{ url_for('data_pengajar') }}">
+    <a class="nav-link sidebar-link {% if active_page == 'data_pengajar' %}active{% endif %}" href="{{ url_for('data_pengajar') }}" data-ajax-nav="true" data-page="data_pengajar">
       <i class="fa fa-database"></i>
       <span class="sidebar-link-label">Data Pengajar</span>
     </a>
-    <a class="nav-link sidebar-link {% if active_page == 'rekapan' %}active{% endif %}" href="{{ url_for('rekapan') }}">
+    <a class="nav-link sidebar-link {% if active_page == 'rekapan' %}active{% endif %}" href="{{ url_for('rekapan') }}" data-ajax-nav="true" data-page="rekapan">
       <i class="fa fa-bar-chart"></i>
       <span class="sidebar-link-label">Rekapan Klasifikasi</span>
     </a>
-    <a class="nav-link sidebar-link {% if active_page == 'preprocessing' %}active{% endif %}" href="{{ url_for('preprocessing') }}">
+    <a class="nav-link sidebar-link {% if active_page == 'preprocessing' %}active{% endif %}" href="{{ url_for('preprocessing') }}" data-ajax-nav="true" data-page="preprocessing">
       <i class="fa fa-upload"></i>
       <span class="sidebar-link-label">Pre-Processing</span>
+    </a>
+    <a class="nav-link sidebar-link sidebar-link-logout" href="{{ url_for('logout') }}">
+      <i class="fa fa-sign-out"></i>
+      <span class="sidebar-link-label">Logout</span>
     </a>
   </nav>
 

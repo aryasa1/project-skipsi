@@ -1,0 +1,59 @@
+<div class="page-fragment" data-page-title="{{ page_title or 'Rekapan Klasifikasi' }}" data-active-page="{{ active_page or 'rekapan' }}">
+  {% include '_flash_messages.html' %}
+
+  <section class="page-intro">
+    <h1 class="page-heading mb-3">Rekapan Klasifikasi</h1>
+    <p class="page-subtitle mb-0">Classification results and performance summary</p>
+  </section>
+
+  <section class="upload-card upload-form-card mb-4">
+    <div class="upload-card-body">
+      <div class="upload-icon"><i class="fa fa-file-text-o"></i></div>
+      <div>
+        <div class="upload-title">Upload Classification Results</div>
+        <p class="upload-note mb-1">Drag and drop or click to browse</p>
+        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+      </div>
+      <button class="btn btn-primary" type="button">Choose File</button>
+    </div>
+  </section>
+
+  <section class="content-card data-table-card mb-4">
+    <div class="table-title-bar">
+      <h3 class="content-title">Classification Summary</h3>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table app-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Pengajar</th>
+            <th>Kategori</th>
+            <th>Skor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in classification_rows %}
+            <tr>
+              <td>{{ row.no }}</td>
+              <td>{{ row.pengajar }}</td>
+              <td>{{ row.kategori }}</td>
+              <td>{{ row.skor }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <p class="mb-0 text-muted">Showing {{ classification_rows|length }} entries</p>
+      <nav aria-label="Pagination">
+        <ul class="pagination mb-0">
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</div>

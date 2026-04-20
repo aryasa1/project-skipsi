@@ -1,0 +1,90 @@
+<div class="page-fragment" data-page-title="{{ page_title or 'Pre-Processing' }}" data-active-page="{{ active_page or 'preprocessing' }}">
+  {% include '_flash_messages.html' %}
+
+  <section class="page-intro">
+    <h1 class="page-heading mb-3">Pre-Processing</h1>
+    <p class="page-subtitle mb-0">Unggah dataset dan pantau riwayat file yang sudah masuk ke sistem.</p>
+  </section>
+
+  <section class="upload-card upload-form-card mb-4">
+    <form class="upload-card-body upload-form" method="post" enctype="multipart/form-data">
+      <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
+      <div>
+        <div class="upload-title">Upload Raw Dataset</div>
+        <p class="upload-note mb-1">Pilih file dataset untuk disimpan ke folder upload aplikasi.</p>
+        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+      </div>
+      <label class="upload-input-label" for="dataset_file">Pilih file</label>
+      <input class="upload-input" id="dataset_file" name="dataset_file" type="file" accept=".csv,.xlsx,.xls" required>
+      <button class="btn btn-primary" type="submit">Upload File</button>
+    </form>
+  </section>
+
+  <section class="content-card mb-4">
+    <div class="content-card-header mb-0">
+      <div>
+        <h3 class="content-title mb-1">Tahapan Pre-Processing</h3>
+        <p class="text-muted mb-0">Urutan kerja yang dipakai sebelum proses klasifikasi dijalankan.</p>
+      </div>
+    </div>
+
+    <div class="timeline-list">
+      {% for step in pipeline_steps %}
+        <div class="timeline-item timeline-card">
+          <span class="timeline-dot bg-primary"></span>
+          <div>
+            <h4>{{ step.title }}</h4>
+            <p class="mb-0">{{ step.description }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="content-card data-table-card mb-4">
+    <div class="table-title-bar">
+      <h3 class="content-title">Preview Data Upload</h3>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table app-table align-middle mb-0">
+        {% if dataset_preview.headers %}
+          <thead>
+            <tr>
+              <th>No</th>
+              {% for header in dataset_preview.headers %}
+                <th>{{ header }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+        {% endif %}
+        <tbody>
+          {% if dataset_preview.rows %}
+            {% for row in dataset_preview.rows %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                {% for value in row %}
+                  <td>{{ value }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="100" class="text-center text-muted">Belum ada data upload untuk ditampilkan.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <p class="mb-0 text-muted">Showing {{ dataset_preview.rows|length }} of {{ dataset_preview.total_rows }} rows</p>
+      <nav aria-label="Pagination">
+        <ul class="pagination mb-0">
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</div>

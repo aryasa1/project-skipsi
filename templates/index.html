@@ -1,49 +1,5 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <section class="page-intro dashboard-intro">
-    <h1 class="page-heading mb-3">Dashboard</h1>
-    <p class="page-subtitle mb-0">Welcome to the Classification System Overview</p>
-  </section>
-
-  <section class="row g-4 mb-5 stats-grid dashboard-stats">
-    {% for stat in stats %}
-      <div class="col-md-6 col-xl-3">
-        <div class="metric-card metric-{{ stat.accent }}">
-          <div>
-            <p class="metric-label">{{ stat.title }}</p>
-            <h2 class="metric-value">{{ stat.value }}</h2>
-          </div>
-          <div class="metric-icon">
-            <i class="fa {{ stat.icon }}"></i>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </section>
-
-  <section class="row g-4 dashboard-hero-wrap">
-    <div class="col-12">
-      <div class="hero-card">
-        <h2 class="hero-title">Quick Start Guide</h2>
-        <div class="hero-guide-grid">
-          <div class="hero-guide-card">
-            <span class="hero-guide-step">1</span>
-            <h3>Upload Data</h3>
-            <p>Navigate to Data Pengajar and upload your teacher dataset</p>
-          </div>
-          <div class="hero-guide-card">
-            <span class="hero-guide-step">2</span>
-            <h3>Process Data</h3>
-            <p>Run pre-processing to clean and prepare your data</p>
-          </div>
-          <div class="hero-guide-card">
-            <span class="hero-guide-step">3</span>
-            <h3>View Results</h3>
-            <p>Check classification results in the Rekapan section</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  {% include '_dashboard_content.html' %}
 {% endblock %}
