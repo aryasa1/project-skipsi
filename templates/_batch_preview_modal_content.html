@@ -1,0 +1,36 @@
+<div class="batch-preview-sheet">
+  <div class="table-title-bar mb-3">
+    <h3 class="content-title">{{ preview_title }}</h3>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table app-table align-middle mb-0">
+      {% if preview_headers %}
+        <thead>
+          <tr>
+            <th>No</th>
+            {% for header in preview_headers %}
+              <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+      {% endif %}
+      <tbody>
+        {% if preview_rows %}
+          {% for row in preview_rows %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              {% for value in row %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="100" class="text-center text-muted">Tidak ada data untuk ditampilkan.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>

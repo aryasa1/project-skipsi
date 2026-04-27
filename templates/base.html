@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendors/font-awesome/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dashboard.css', v='20260420c') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app-custom.css', v='20260427a') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
   </head>
   <body class="app-body">
@@ -24,10 +25,22 @@
       </main>
     </div>
 
+    <div class="app-modal" id="batchPreviewModal" hidden>
+      <div class="app-modal-backdrop" data-modal-close></div>
+      <div class="app-modal-dialog">
+        <button class="app-modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+        <div class="app-modal-body" id="batchPreviewModalBody"></div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='vendors/chart.js/chart.umd.js') }}"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const appContent = document.getElementById('appContent');
+        const batchPreviewModal = document.getElementById('batchPreviewModal');
+        const batchPreviewModalBody = document.getElementById('batchPreviewModalBody');
         let searchTimer = null;
+        let activeCharts = [];
 
         if (!appContent) {
           return;
@@ -38,6 +51,64 @@
             const isActive = activePage && link.dataset.page === activePage;
             link.classList.toggle('active', isActive);
           });
+        };
+
+        const initializeCharts = () => {
+          if (typeof Chart === 'undefined') {
+            return;
+          }
+
+          activeCharts.forEach((chart) => chart.destroy());
+          activeCharts = [];
+
+          appContent.querySelectorAll('[data-classification-chart]').forEach((chartCanvas) => {
+            const labels = JSON.parse(chartCanvas.dataset.labels || '[]');
+            const values = JSON.parse(chartCanvas.dataset.values || '[]');
+
+            if (!labels.length || !values.length) {
+              return;
+            }
+
+            const chart = new Chart(chartCanvas, {
+              type: 'pie',
+              data: {
+                labels,
+                datasets: [
+                  {
+                    data: values,
+                    backgroundColor: ['#1f6feb', '#2da44e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                    borderWidth: 0,
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  }
+                }
+              }
+            });
+            activeCharts.push(chart);
+          });
+        };
+
+        const closeModal = () => {
+          if (!batchPreviewModal) {
+            return;
+          }
+          batchPreviewModal.hidden = true;
+          batchPreviewModalBody.innerHTML = '';
+        };
+
+        const openModal = (html) => {
+          if (!batchPreviewModal) {
+            return;
+          }
+          batchPreviewModalBody.innerHTML = html;
+          batchPreviewModal.hidden = false;
         };
 
         const applyFragment = (html, url, pushState = true) => {
@@ -56,6 +127,7 @@
           }
 
           updateActiveSidebar(activePage);
+          initializeCharts();
 
           if (pushState) {
             window.history.pushState({ url }, '', url);
@@ -105,6 +177,31 @@
           event.preventDefault();
           fetchContent(url.toString());
         }, true);
+
+        document.addEventListener('click', async (event) => {
+          const previewButton = event.target.closest('[data-preview-url]');
+          if (previewButton) {
+            event.preventDefault();
+            try {
+              const response = await fetch(previewButton.dataset.previewUrl, {
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              });
+              if (!response.ok) {
+                throw new Error('Preview request failed');
+              }
+              openModal(await response.text());
+            } catch (error) {
+              openModal('<p class="text-muted mb-0">Preview data tidak bisa dimuat.</p>');
+            }
+            return;
+          }
+
+          if (event.target.closest('[data-modal-close]')) {
+            closeModal();
+          }
+        });
 
         document.addEventListener('input', (event) => {
           const input = event.target.closest('[data-live-search-input]');
@@ -157,6 +254,8 @@
         window.addEventListener('popstate', () => {
           fetchContent(window.location.href, false);
         });
+
+        initializeCharts();
       });
     </script>
   </body>

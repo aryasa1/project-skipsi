@@ -14,35 +14,7 @@
   <body class="auth-body">
     <div class="auth-shell container-fluid">
       <div class="row min-vh-100">
-        <div class="col-lg-6 auth-panel-left d-none d-lg-flex">
-          <div class="auth-hero">
-            <p class="eyebrow mb-3">Minimal Workspace</p>
-            <h1 class="auth-title">Dashboard akademik yang bersih, rapi, dan fokus pada data.</h1>
-            <p class="auth-copy">
-              Antarmuka disusun ulang dengan pendekatan profesional dan minimal agar nyaman dipakai di desktop maupun mobile.
-            </p>
-
-            <div class="auth-feature-grid">
-              <div class="auth-feature-card">
-                <span>01</span>
-                <h2>Upload Data</h2>
-                <p>Masuk ke data pengajar dan mulai siapkan dataset.</p>
-              </div>
-              <div class="auth-feature-card">
-                <span>02</span>
-                <h2>Pre-Process</h2>
-                <p>Rapikan data sebelum proses klasifikasi dijalankan.</p>
-              </div>
-              <div class="auth-feature-card">
-                <span>03</span>
-                <h2>Review Result</h2>
-                <p>Lihat rekapan hasil dan ringkasan performa dengan cepat.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-6 auth-panel-right">
+        <div class="col-12 auth-panel-right">
           <div class="auth-form-wrap">
             {% include '_flash_messages.html' %}
             {% block content %}{% endblock %}

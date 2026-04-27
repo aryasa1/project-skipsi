@@ -1,13 +1,16 @@
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5050
 Press CTRL+C to quit
-127.0.0.1 - - [20/Apr/2026 20:27:17] "GET /dashboard HTTP/1.1" 302 -
-127.0.0.1 - - [20/Apr/2026 20:27:17] "GET /login HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:26] "GET /dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:26] "GET /static/vendors/font-awesome/css/font-awesome.min.css HTTP/1.1" 304 -
-127.0.0.1 - - [20/Apr/2026 20:27:26] "GET /static/css/bootstrap-dashboard.css?v=20260420c HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:26] "GET /static/vendors/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0 HTTP/1.1" 304 -
-127.0.0.1 - - [20/Apr/2026 20:27:31] "GET /data_pengajar HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:32] "GET /rekapan HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:33] "GET /preprocessing HTTP/1.1" 200 -
-127.0.0.1 - - [20/Apr/2026 20:27:55] "GET /rekapan HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:28:27] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:28:32] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:28:32] "GET /static/css/bootstrap-dashboard.css?v=20260419c HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:28:32] "GET /static/vendors/font-awesome/css/font-awesome.min.css HTTP/1.1" 304 -
+127.0.0.1 - - [20/Apr/2026 21:28:32] "GET /static/images/favicon.png HTTP/1.1" 304 -
+127.0.0.1 - - [20/Apr/2026 21:29:12] "POST /login HTTP/1.1" 302 -
+127.0.0.1 - - [20/Apr/2026 21:29:12] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:29:12] "GET /static/vendors/font-awesome/css/font-awesome.min.css HTTP/1.1" 304 -
+127.0.0.1 - - [20/Apr/2026 21:29:12] "GET /static/css/bootstrap-dashboard.css?v=20260420c HTTP/1.1" 304 -
+127.0.0.1 - - [20/Apr/2026 21:29:12] "GET /static/vendors/font-awesome/fonts/fontawesome-webfont.woff2?v=4.7.0 HTTP/1.1" 304 -
+127.0.0.1 - - [20/Apr/2026 21:29:14] "GET /data_pengajar HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:29:15] "GET /rekapan HTTP/1.1" 200 -
+127.0.0.1 - - [20/Apr/2026 21:29:16] "GET /preprocessing HTTP/1.1" 200 -

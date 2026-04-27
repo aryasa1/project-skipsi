@@ -1,90 +1,177 @@
-<div class="page-fragment" data-page-title="{{ page_title or 'Pre-Processing' }}" data-active-page="{{ active_page or 'preprocessing' }}">
+<div class="page-fragment" data-page-title="{{ page_title or 'Input Data' }}" data-active-page="{{ active_page or 'input_data' }}">
   {% include '_flash_messages.html' %}
 
   <section class="page-intro">
-    <h1 class="page-heading mb-3">Pre-Processing</h1>
-    <p class="page-subtitle mb-0">Unggah dataset dan pantau riwayat file yang sudah masuk ke sistem.</p>
-  </section>
-
-  <section class="upload-card upload-form-card mb-4">
-    <form class="upload-card-body upload-form" method="post" enctype="multipart/form-data">
-      <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
-      <div>
-        <div class="upload-title">Upload Raw Dataset</div>
-        <p class="upload-note mb-1">Pilih file dataset untuk disimpan ke folder upload aplikasi.</p>
-        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
-      </div>
-      <label class="upload-input-label" for="dataset_file">Pilih file</label>
-      <input class="upload-input" id="dataset_file" name="dataset_file" type="file" accept=".csv,.xlsx,.xls" required>
-      <button class="btn btn-primary" type="submit">Upload File</button>
-    </form>
+    <h1 class="page-heading mb-3">Input Data</h1>
+    <p class="page-subtitle mb-0">Kelola proses berdasarkan batch dari upload sampai hasil klasifikasi.</p>
   </section>
 
   <section class="content-card mb-4">
-    <div class="content-card-header mb-0">
-      <div>
-        <h3 class="content-title mb-1">Tahapan Pre-Processing</h3>
-        <p class="text-muted mb-0">Urutan kerja yang dipakai sebelum proses klasifikasi dijalankan.</p>
-      </div>
-    </div>
-
-    <div class="timeline-list">
-      {% for step in pipeline_steps %}
-        <div class="timeline-item timeline-card">
-          <span class="timeline-dot bg-primary"></span>
-          <div>
-            <h4>{{ step.title }}</h4>
-            <p class="mb-0">{{ step.description }}</p>
-          </div>
-        </div>
-      {% endfor %}
+    <div class="wizard-tabs">
+      <a class="wizard-tab {% if active_tab == 'upload' %}wizard-tab-active{% endif %}" href="{{ url_for('input_data', tab='upload') }}" data-ajax-nav="true">
+        <span class="wizard-tab-step">1</span>
+        <span>Upload Data</span>
+      </a>
+      <a class="wizard-tab {% if active_tab == 'preprocessing' %}wizard-tab-active{% endif %}" href="{{ url_for('input_data', tab='preprocessing') }}" data-ajax-nav="true">
+        <span class="wizard-tab-step">2</span>
+        <span>Hasil Preprocessing</span>
+      </a>
+      <a class="wizard-tab {% if active_tab == 'classification' %}wizard-tab-active{% endif %}" href="{{ url_for('input_data', tab='classification') }}" data-ajax-nav="true">
+        <span class="wizard-tab-step">3</span>
+        <span>Hasil Klasifikasi</span>
+      </a>
     </div>
   </section>
 
-  <section class="content-card data-table-card mb-4">
-    <div class="table-title-bar">
-      <h3 class="content-title">Preview Data Upload</h3>
-    </div>
+  {% if active_tab == 'upload' %}
+    <section class="upload-card upload-form-card mb-4">
+      <form class="upload-card-body upload-form" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="upload">
+        <div class="upload-icon"><i class="fa fa-cloud-upload"></i></div>
+        <div>
+          <div class="upload-title">Upload File Dataset</div>
+          <p class="upload-note mb-1">Setelah upload, batch akan masuk ke daftar dan bisa langsung diproses.</p>
+          <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+        </div>
+        <label class="upload-input-label" for="dataset_file">Pilih file</label>
+        <input class="upload-input" id="dataset_file" name="dataset_file" type="file" accept=".csv,.xlsx,.xls" required>
+        <button class="btn btn-primary" type="submit">Upload File</button>
+      </form>
+    </section>
 
-    <div class="table-responsive">
-      <table class="table app-table align-middle mb-0">
-        {% if dataset_preview.headers %}
+    <section class="content-card data-table-card mb-4">
+      <div class="table-title-bar">
+        <h3 class="content-title">Daftar Batch Upload</h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table app-table align-middle mb-0">
           <thead>
             <tr>
               <th>No</th>
-              {% for header in dataset_preview.headers %}
-                <th>{{ header }}</th>
-              {% endfor %}
+              <th>Timestamp</th>
+              <th>Nama File</th>
+              <th>Aksi</th>
             </tr>
           </thead>
-        {% endif %}
-        <tbody>
-          {% if dataset_preview.rows %}
-            {% for row in dataset_preview.rows %}
+          <tbody>
+            {% if upload_batches %}
+              {% for batch in upload_batches %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ batch.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>
+                    <button class="btn btn-link table-preview-link p-0" type="button" data-preview-url="{{ url_for('batch_preview', batch_type='upload', batch_id=batch.id) }}">
+                      {{ batch.file_name }}
+                    </button>
+                  </td>
+                  <td>
+                    <form method="post" class="inline-form">
+                      <input type="hidden" name="action" value="preprocess">
+                      <input type="hidden" name="upload_batch_id" value="{{ batch.id }}">
+                      <button class="btn btn-primary btn-sm" type="submit">Preprocess Data</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
               <tr>
-                <td>{{ loop.index }}</td>
-                {% for value in row %}
-                  <td>{{ value }}</td>
-                {% endfor %}
+                <td colspan="4" class="text-center text-muted">Belum ada batch upload.</td>
               </tr>
-            {% endfor %}
-          {% else %}
-            <tr>
-              <td colspan="100" class="text-center text-muted">Belum ada data upload untuk ditampilkan.</td>
-            </tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
 
-    <div class="table-footer">
-      <p class="mb-0 text-muted">Showing {{ dataset_preview.rows|length }} of {{ dataset_preview.total_rows }} rows</p>
-      <nav aria-label="Pagination">
-        <ul class="pagination mb-0">
-          <li class="page-item disabled"><span class="page-link">Previous</span></li>
-          <li class="page-item disabled"><span class="page-link">Next</span></li>
-        </ul>
-      </nav>
-    </div>
-  </section>
+  {% if active_tab == 'preprocessing' %}
+    <section class="content-card data-table-card mb-4">
+      <div class="table-title-bar">
+        <h3 class="content-title">Daftar Batch Preprocessing</h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table app-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Timestamp</th>
+              <th>Nama File</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if preprocessing_batches %}
+              {% for batch in preprocessing_batches %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ batch.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>
+                    <button class="btn btn-link table-preview-link p-0" type="button" data-preview-url="{{ url_for('batch_preview', batch_type='preprocessing', batch_id=batch.id) }}">
+                      {{ batch.file_name }}
+                    </button>
+                  </td>
+                  <td>
+                    <form method="post" class="inline-form">
+                      <input type="hidden" name="action" value="classify">
+                      <input type="hidden" name="preprocessing_batch_id" value="{{ batch.id }}">
+                      <button class="btn btn-primary btn-sm" type="submit">Klasifikasi Data</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="4" class="text-center text-muted">Belum ada batch preprocessing.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+
+  {% if active_tab == 'classification' %}
+    <section class="content-card data-table-card mb-4">
+      <div class="table-title-bar">
+        <h3 class="content-title">Daftar Hasil Klasifikasi</h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table app-table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Timestamp</th>
+              <th>Nama File</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if classification_batches %}
+              {% for batch in classification_batches %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>{{ batch.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>
+                    <button class="btn btn-link table-preview-link p-0" type="button" data-preview-url="{{ url_for('batch_preview', batch_type='classification', batch_id=batch.id) }}">
+                      {{ batch.file_name }}
+                    </button>
+                  </td>
+                  <td>
+                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_classification', classification_batch_id=batch.id) }}">Download Hasil</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="4" class="text-center text-muted">Belum ada batch klasifikasi.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
 </div>

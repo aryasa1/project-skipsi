@@ -3,24 +3,75 @@
 
   <section class="page-intro">
     <h1 class="page-heading mb-3">Rekapan Klasifikasi</h1>
-    <p class="page-subtitle mb-0">Classification results and performance summary</p>
+    <p class="page-subtitle mb-0">Overview hasil klasifikasi tersimpan beserta unduhan PDF per batch atau per rentang timestamp.</p>
   </section>
 
-  <section class="upload-card upload-form-card mb-4">
-    <div class="upload-card-body">
-      <div class="upload-icon"><i class="fa fa-file-text-o"></i></div>
-      <div>
-        <div class="upload-title">Upload Classification Results</div>
-        <p class="upload-note mb-1">Drag and drop or click to browse</p>
-        <p class="upload-meta mb-0">Supported formats: CSV, Excel (.xlsx, .xls)</p>
-      </div>
-      <button class="btn btn-primary" type="button">Choose File</button>
+  <section class="content-card mb-4">
+    <div class="table-title-bar mb-3">
+      <h3 class="content-title">Download Rentang Timestamp</h3>
     </div>
+    <form class="range-download-form" action="{{ url_for('download_rekapan_pdf') }}" method="get">
+      <div class="range-download-grid">
+        <div>
+          <label class="form-label" for="start_timestamp">Mulai Timestamp</label>
+          <input class="form-control" id="start_timestamp" name="start_timestamp" type="datetime-local">
+        </div>
+        <div>
+          <label class="form-label" for="end_timestamp">Sampai Timestamp</label>
+          <input class="form-control" id="end_timestamp" name="end_timestamp" type="datetime-local">
+        </div>
+        <div class="range-download-action">
+          <button class="btn btn-primary" type="submit">Download PDF Rekapan</button>
+        </div>
+      </div>
+    </form>
   </section>
 
   <section class="content-card data-table-card mb-4">
     <div class="table-title-bar">
-      <h3 class="content-title">Classification Summary</h3>
+      <h3 class="content-title">Overview Klasifikasi</h3>
+    </div>
+
+    <div class="table-responsive mb-4">
+      <table class="table app-table align-middle mb-0">
+        <tbody>
+          {% if summary_cards %}
+            <tr>
+              {% for card in summary_cards %}
+                <td>
+                  <div class="summary-pill">
+                    <span class="summary-pill-label">{{ card.title }}</span>
+                    <strong>{{ card.value }}</strong>
+                  </div>
+                </td>
+              {% endfor %}
+            </tr>
+          {% else %}
+            <tr>
+              <td class="text-center text-muted">Belum ada hasil klasifikasi yang tersimpan.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if classification_chart.labels %}
+      <div class="classification-chart-panel">
+        <div class="classification-chart-wrap">
+          <canvas
+            data-classification-chart
+            data-labels='{{ classification_chart.labels|tojson }}'
+            data-values='{{ classification_chart["values"]|tojson }}'></canvas>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state-box">Pie chart akan tampil setelah ada hasil klasifikasi yang tersimpan.</div>
+    {% endif %}
+  </section>
+
+  <section class="content-card data-table-card mb-4">
+    <div class="table-title-bar">
+      <h3 class="content-title">Daftar Batch Hasil Klasifikasi</h3>
     </div>
 
     <div class="table-responsive">
@@ -28,32 +79,38 @@
         <thead>
           <tr>
             <th>No</th>
-            <th>Pengajar</th>
-            <th>Kategori</th>
-            <th>Skor</th>
+            <th>Timestamp</th>
+            <th>Nama File</th>
+            <th>Download</th>
           </tr>
         </thead>
         <tbody>
-          {% for row in classification_rows %}
+          {% if classification_batches %}
+            {% for row in classification_batches %}
+              <tr>
+                <td>{{ row.no }}</td>
+                <td>{{ row.timestamp }}</td>
+                <td>
+                  <button class="btn btn-link table-preview-link p-0" type="button" data-preview-url="{{ url_for('batch_preview', batch_type='classification', batch_id=row.id) }}">
+                    {{ row.file_name }}
+                  </button>
+                </td>
+                <td>
+                  <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_classification', classification_batch_id=row.id) }}">Download</a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
             <tr>
-              <td>{{ row.no }}</td>
-              <td>{{ row.pengajar }}</td>
-              <td>{{ row.kategori }}</td>
-              <td>{{ row.skor }}</td>
+              <td colspan="4" class="text-center text-muted">Belum ada batch klasifikasi yang bisa ditampilkan.</td>
             </tr>
-          {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>
 
     <div class="table-footer">
-      <p class="mb-0 text-muted">Showing {{ classification_rows|length }} entries</p>
-      <nav aria-label="Pagination">
-        <ul class="pagination mb-0">
-          <li class="page-item disabled"><span class="page-link">Previous</span></li>
-          <li class="page-item disabled"><span class="page-link">Next</span></li>
-        </ul>
-      </nav>
+      <p class="mb-0 text-muted">Showing {{ classification_batches|length }} entries</p>
     </div>
   </section>
 </div>
