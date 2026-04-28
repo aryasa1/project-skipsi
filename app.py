@@ -4,6 +4,7 @@ import os
 import re
 from collections import Counter
 from datetime import datetime
+from preprocessing_utils import run_pipeline
 
 from flask import Flask, flash, make_response, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +16,19 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 from werkzeug.utils import secure_filename
+
+# Pastikan import ini ada
+import joblib
+import os
+
+# Tentukan path model
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
+TFIDF_PATH = os.path.join(MODEL_DIR, 'tfidf_cetta.pkl')
+MODEL_PATH = os.path.join(MODEL_DIR, 'model_nb_cetta.pkl')
+
+# Load model secara global agar bisa diakses oleh fungsi input_data
+tfidf_vectorizer = joblib.load(TFIDF_PATH)
+naive_bayes_model = joblib.load(MODEL_PATH)
 
 app = Flask(__name__)
 app.secret_key = 'secretkey'
@@ -835,6 +849,11 @@ def input_data():
             db.session.add(preprocessing_batch)
             rows = []
             for record in records:
+                # --- INTEGRASI PIPELINE DI SINI ---
+                # Menggabungkan teks yang akan di-preprocess
+                teks_mentah = record['kritiksaran_laoshi']
+                hasil_bersih = run_pipeline(teks_mentah)
+                
                 rows.append(
                     HasilPreprocessing(
                         batch_code=batch_code,
@@ -848,13 +867,13 @@ def input_data():
                         q4=record['q4'],
                         kritiksaran_laoshi=record['kritiksaran_laoshi'],
                         kritiksaran_cetta=record['kritiksaran_cetta'],
-                        hasil_preprocessing='Data siap untuk tahap preprocessing lanjutan',
+                        hasil_preprocessing=hasil_bersih, # Simpan hasil pipeline
                     )
                 )
 
             db.session.add_all(rows)
             db.session.commit()
-            flash(f'Batch {upload_batch.file_name} berhasil diproses.', 'success')
+            flash(f'Batch {upload_batch.file_name} berhasil diproses dengan NLP Pipeline.', 'success')
             return redirect(url_for('input_data', tab='preprocessing'))
 
         if action == 'classify':
@@ -864,10 +883,23 @@ def input_data():
                 flash('Batch preprocessing tidak ditemukan.', 'danger')
                 return redirect(url_for('input_data', tab='preprocessing'))
 
+            # Ambil data hasil preprocessing yang akan diklasifikasikan
             preprocessing_rows = get_batch_rows(HasilPreprocessing, preprocessing_batch.batch_code)
+
             if not preprocessing_rows:
                 flash('Belum ada data preprocessing yang bisa diklasifikasikan.', 'danger')
                 return redirect(url_for('input_data', tab='preprocessing'))
+            
+            # --- LOGIKA KLASIFIKASI BARU ---
+            # Siapkan list teks untuk ditransformasi
+            texts = [row.hasil_preprocessing for row in preprocessing_rows]
+
+            # Transformasi ke vektor TF-IDF
+            tfidf_matrix = tfidf_vectorizer.transform(texts)
+
+            # Prediksi dengan Naive Bayes
+            prediksi_hasil = naive_bayes_model.predict(tfidf_matrix)
+            # -------------------------------
 
             existing_cls_batch = ClassificationBatch.query.filter_by(preprocessing_batch_id=preprocessing_batch.id).first()
             if existing_cls_batch is not None:
@@ -882,8 +914,9 @@ def input_data():
                 file_name=preprocessing_batch.file_name,
             )
             db.session.add(classification_batch)
+
             classification_rows = []
-            for row in preprocessing_rows:
+            for i, row in enumerate(preprocessing_rows):
                 classification_rows.append(
                     HasilKlasifikasi(
                         batch_code=batch_code,
@@ -901,7 +934,8 @@ def input_data():
                         kritiksaran_laoshi=row.kritiksaran_laoshi,
                         kritiksaran_cetta=row.kritiksaran_cetta,
                         hasil_preprocessing=row.hasil_preprocessing,
-                        hasil_klasifikasi=row.kelas or 'Belum ditentukan',
+                        # Hasil prediksi diambil dari index loop i
+                        hasil_klasifikasi=prediksi_hasil[i] 
                     )
                 )
 
