@@ -450,10 +450,10 @@ def build_pdf_response(title, subtitle, classification_rows, filename):
         'Nama File',
         'Kelas',
         'Nama Laoshi',
-        'Q1',
-        'Q2',
-        'Q3',
-        'Q4',
+         #'Seberapa puas Kamu dengan materi yang diberikan selama kelas?',
+         #'Seberapa paham kamu dengan materi yang diberikan selama kelas?',
+         #'Seberapa seru kegiatan belajar selama kelas?',
+        'Kritik Dan Saran Untuk laoshi',
         'Hasil Klasifikasi',
     ]]
     for index, row in enumerate(classification_rows, start=1):
@@ -463,10 +463,10 @@ def build_pdf_response(title, subtitle, classification_rows, filename):
             row.source_file,
             row.kelas,
             row.nama_laoshi,
-            row.q1 or '',
-            row.q2 or '',
-            row.q3 or '',
-            row.q4 or '',
+             #row.q1 or '',
+             #row.q2 or '',
+             #row.q3 or '',
+            row.kritiksaran_laoshi or '',
             row.hasil_klasifikasi,
         ])
 
@@ -528,9 +528,9 @@ def get_upload_batch_preview(upload_batch):
 
 def get_preprocessing_batch_preview(pre_batch):
     rows = get_batch_rows(HasilPreprocessing, pre_batch.batch_code)
-    headers = ['Timestamp', 'Kelas', 'Nama Laoshi', 'Q1', 'Q2', 'Q3', 'Q4', 'Kritik Saran Laoshi', 'Kritik Saran Cetta', 'Hasil Preprocessing']
+    headers = ['Timestamp', 'Kelas', 'Nama Laoshi', 'Kritik Saran Laoshi', 'Hasil Preprocessing']
     values = [
-        [row.timestamp, row.kelas, row.nama_laoshi, row.q1, row.q2, row.q3, row.q4, row.kritiksaran_laoshi, row.kritiksaran_cetta, row.hasil_preprocessing]
+        [row.timestamp, row.kelas, row.nama_laoshi, row.kritiksaran_laoshi, row.hasil_preprocessing]
         for row in rows[:50]
     ]
     return {'headers': headers, 'rows': values}
@@ -538,9 +538,9 @@ def get_preprocessing_batch_preview(pre_batch):
 
 def get_classification_batch_preview(cls_batch):
     rows = get_batch_rows(HasilKlasifikasi, cls_batch.batch_code)
-    headers = ['Timestamp', 'Kelas', 'Nama Laoshi', 'Q1', 'Q2', 'Q3', 'Q4', 'Hasil Preprocessing', 'Hasil Klasifikasi']
+    headers = ['Timestamp', 'Kelas', 'Nama Laoshi', 'Kritik Saran Laoshi', 'Hasil Preprocessing', 'Hasil Klasifikasi']
     values = [
-        [row.timestamp, row.kelas, row.nama_laoshi, row.q1, row.q2, row.q3, row.q4, row.hasil_preprocessing, row.hasil_klasifikasi]
+        [row.timestamp, row.kelas, row.nama_laoshi, row.kritiksaran_laoshi, row.hasil_preprocessing, row.hasil_klasifikasi]
         for row in rows[:50]
     ]
     return {'headers': headers, 'rows': values}
