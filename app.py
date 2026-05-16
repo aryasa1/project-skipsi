@@ -8,7 +8,7 @@ from preprocessing_utils import run_pipeline
 
 from flask import Flask, flash, make_response, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
-from reportlab.graphics import renderPDF
+from reportlab.graphics import renderPDF #proses convert data ke pdf
 from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.shapes import Drawing, String
 from reportlab.lib import colors
@@ -580,7 +580,6 @@ class UploadBatch(db.Model):
 
 class PreprocessingBatch(db.Model):
     __tablename__ = 'preprocessing_batch'
-
     id = db.Column(db.Integer, primary_key=True)
     batch_code = db.Column(db.String(40), nullable=False, unique=True, index=True)
     upload_batch_id = db.Column(db.Integer, nullable=False, index=True)
